@@ -141,6 +141,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Firestore write failed (signup):', err);
     }
+
+    // ✅ FIX Bug 1: actualizar appUser en el estado local
+    // sin esto la UI queda congelada en "Cargando..." tras el registro
+    const au = await fetchOrCreateAppUser(user);
+    setAppUser(au);
   };
 
   const logout = async () => {
