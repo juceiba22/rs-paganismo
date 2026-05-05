@@ -19,7 +19,7 @@ import type { AppUser } from '../types';
 
 interface AuthContextType {
   currentUser: User | null;
-  appUser: AppUser | null;
+  appUser: AppUser | null | undefined;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
@@ -38,61 +38,79 @@ export function useAuth() {
 }
 
 async function fetchOrCreateAppUser(user: User): Promise<AppUser | null> {
-  const ref = doc(db, 'users', user.uid);
-  const snap = await getDoc(ref);
+  try {
+    const ref = doc(db, 'users', user.uid);
+    const snap = await getDoc(ref);
 
-  if (snap.exists()) {
-    const data = snap.data();
-    return {
-      uid: user.uid,
-      name: data.name,
-      email: data.email,
-      role: data.role,
-      artisticRole: data.artisticRole,
-      photoURL: data.photoURL,
-      createdAt: data.createdAt?.toDate?.() ?? new Date(),
-    } as AppUser;
+    if (snap.exists()) {
+      const data = snap.data();
+      return {
+        uid: user.uid,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        artisticRole: data.artisticRole,
+        photoURL: data.photoURL,
+        createdAt: data.createdAt?.toDate?.() ?? new Date(),
+      };
+    }
+
+    return null;
+  } catch (err) {
+    console.error('Firestore read failed:', err);
+    return null;
   }
-
-  // New user → needs onboarding
-  return null;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [appUser, setAppUser] = useState<AppUser | null>(null);
+  const [appUser, setAppUser] = useState<AppUser | null | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
+
       if (user) {
-        const au = await fetchOrCreateAppUser(user);
-        setAppUser(au);
+        try {
+          const au = await fetchOrCreateAppUser(user);
+          setAppUser(au);
+        } catch (err) {
+          console.error('Error fetching app user:', err);
+          setAppUser(null);
+        }
       } else {
         setAppUser(null);
       }
+
       setLoading(false);
     });
+
     return unsub;
   }, []);
 
   const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
-    const ref = doc(db, 'users', user.uid);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) {
-      // Will be handled by onboarding — stub record
-      await setDoc(ref, {
-        name: user.displayName ?? '',
-        email: user.email ?? '',
-        photoURL: user.photoURL ?? '',
-        role: 'pending',
-        artisticRole: 'other',
-        createdAt: serverTimestamp(),
-      });
+
+    try {
+      const ref = doc(db, 'users', user.uid);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) {
+        await setDoc(ref, {
+          name: user.displayName ?? '',
+          email: user.email ?? '',
+          photoURL: user.photoURL ?? '',
+          role: 'pending',
+          artisticRole: 'other',
+          createdAt: serverTimestamp(),
+        });
+      }
+    } catch (err) {
+      console.error('Firestore write failed (Google):', err);
     }
+
     const au = await fetchOrCreateAppUser(user);
     setAppUser(au);
   };
@@ -102,16 +120,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUpWithEmail = async (email: string, password: string) => {
-    // 1. Validate Firebase config
-    if (!auth || !db) throw new Error('Firebase not properly initialized');
-    
-    // 2. Create auth user
+    if (!auth || !db) throw new Error('Firebase not initialized');
+
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const user = result.user;
-    
-    if (!user || !user.uid) throw new Error('User creation failed: no UID returned');
 
-    // 3. Resilient Firestore write
+    if (!user?.uid) throw new Error('User creation failed');
+
     try {
       const ref = doc(db, 'users', user.uid);
       await setDoc(ref, {
@@ -123,9 +138,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         artisticRole: 'other',
         createdAt: serverTimestamp(),
       });
-    } catch (dbError) {
-      // Log error but DO NOT block login/signup flow
-      console.error('Firestore user creation failed. Auth succeeded.', dbError);
+    } catch (err) {
+      console.error('Firestore write failed (signup):', err);
     }
   };
 
@@ -135,6 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isAdmin = appUser?.role === 'admin';
+
   const isApproved =
     appUser?.role === 'admin' ||
     appUser?.role === 'core' ||
