@@ -33,13 +33,21 @@ export default function LoginPage() {
       if (mode === 'login') await signInWithEmail(email, password);
       else await signUpWithEmail(email, password);
     } catch (err: unknown) {
-      const msg = (err as { message?: string })?.message ?? '';
-      if (msg.includes('wrong-password') || msg.includes('user-not-found')) {
+      console.error('Auth error:', err);
+      const msg = (err as { message?: string })?.message ?? String(err);
+      
+      if (msg.includes('wrong-password') || msg.includes('user-not-found') || msg.includes('invalid-credential')) {
         setError('Credenciales incorrectas.');
       } else if (msg.includes('email-already-in-use')) {
         setError('Este correo ya está registrado.');
+      } else if (msg.includes('invalid-email')) {
+        setError('El correo electrónico no es válido.');
+      } else if (msg.includes('weak-password')) {
+        setError('La contraseña es demasiado débil (mínimo 6 caracteres).');
+      } else if (msg.includes('permission-denied')) {
+        setError('No tienes permisos suficientes.');
       } else {
-        setError('Ocurrió un error. Inténtalo de nuevo.');
+        setError(msg || 'Ocurrió un error. Inténtalo de nuevo.');
       }
     } finally {
       setBusy(false);

@@ -102,17 +102,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUpWithEmail = async (email: string, password: string) => {
+    // 1. Validate Firebase config
+    if (!auth || !db) throw new Error('Firebase not properly initialized');
+    
+    // 2. Create auth user
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const user = result.user;
-    const ref = doc(db, 'users', user.uid);
-    await setDoc(ref, {
-      name: '',
-      email: user.email ?? '',
-      photoURL: '',
-      role: 'pending',
-      artisticRole: 'other',
-      createdAt: serverTimestamp(),
-    });
+    
+    if (!user || !user.uid) throw new Error('User creation failed: no UID returned');
+
+    // 3. Resilient Firestore write
+    try {
+      const ref = doc(db, 'users', user.uid);
+      await setDoc(ref, {
+        uid: user.uid,
+        name: '',
+        email: user.email ?? '',
+        photoURL: '',
+        role: 'pending',
+        artisticRole: 'other',
+        createdAt: serverTimestamp(),
+      });
+    } catch (dbError) {
+      // Log error but DO NOT block login/signup flow
+      console.error('Firestore user creation failed. Auth succeeded.', dbError);
+    }
   };
 
   const logout = async () => {
