@@ -1,31 +1,37 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 interface Props {
   children: React.ReactNode;
   requireApproved?: boolean;
-  requireAdmin?: boolean;
 }
 
-export default function ProtectedRoute({ children, requireApproved = true, requireAdmin = false }: Props) {
-  const { currentUser, appUser, loading } = useAuth();
+export default function ProtectedRoute({
+  children,
+  requireApproved = true,
+}: Props) {
+  const { currentUser, appUser, loading, isApproved } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="loader" style={{ minHeight: '100dvh' }}>
-        <div className="loader-ring" />
-      </div>
-    );
+  // 🧠 1. Esperar carga REAL
+  if (loading || appUser === undefined) {
+    return <div>Cargando...</div>;
   }
 
-  if (!currentUser) return <Navigate to="/login" replace />;
+  // 🚪 2. No logeado
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
 
-  if (!appUser) return <Navigate to="/onboarding" replace />;
+  // 🧩 3. Usuario sin doc → onboarding
+  if (appUser === null) {
+    return <Navigate to="/onboarding" replace />;
+  }
 
-  if (requireAdmin && appUser.role !== 'admin') return <Navigate to="/" replace />;
+  // ⛔ 4. No aprobado
+  if (requireApproved && !isApproved) {
+    return <Navigate to="/pending" replace />;
+  }
 
-  if (requireApproved && appUser.role === 'pending') return <Navigate to="/pending" replace />;
-
+  // ✅ 5. OK
   return <>{children}</>;
 }
