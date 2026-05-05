@@ -12,26 +12,37 @@ export default function ProtectedRoute({
 }: Props) {
   const { currentUser, appUser, loading, isApproved } = useAuth();
 
-  // 🧠 1. Esperar carga REAL
+  // 1. Esperar carga REAL
   if (loading || appUser === undefined) {
     return <div>Cargando...</div>;
   }
 
-  // 🚪 2. No logeado
+  // 2. No logeado → login
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
 
-  // 🧩 3. Usuario sin doc → onboarding
+  // 3. Si la ruta NO requiere aprobación (onboarding, pending)
+  //    dejar pasar siempre que el usuario esté autenticado
+  if (!requireApproved) {
+    return <>{children}</>;
+  }
+
+  // 4. Usuario sin doc de Firestore → onboarding
   if (appUser === null) {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // ⛔ 4. No aprobado
-  if (requireApproved && !isApproved) {
+  // 5. Usuario con nombre vacío → onboarding
+  if (!appUser.name) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // 6. No aprobado → pending
+  if (!isApproved) {
     return <Navigate to="/pending" replace />;
   }
 
-  // ✅ 5. OK
+  // 7. OK
   return <>{children}</>;
 }
