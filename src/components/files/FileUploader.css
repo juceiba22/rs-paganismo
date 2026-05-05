@@ -1,0 +1,44 @@
+.file-uploader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 28px 20px;
+  border: 1px dashed var(--border-gold);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--gold-glow);
+  text-align: center;
+}
+
+.file-uploader:hover {
+  background: rgba(201,168,76,0.12);
+  border-color: var(--gold);
+}
+
+.file-uploader--busy {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.file-uploader--busy .file-uploader__icon {
+  animation: spin 1s linear infinite;
+}
+
+.file-uploader__icon {
+  font-size: 1.5rem;
+  color: var(--gold);
+  opacity: 0.7;
+}
+
+.file-uploader__text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+.file-uploader__hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}

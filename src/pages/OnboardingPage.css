@@ -1,0 +1,71 @@
+.onboarding-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  position: relative;
+}
+
+.onboarding-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.onboarding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+}
+
+.role-card:hover {
+  border-color: var(--border-gold);
+  color: var(--text);
+}
+
+.role-card--active {
+  border-color: var(--gold);
+  background: var(--gold-glow);
+  color: var(--gold);
+}
+
+.role-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.role-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.onboarding-note {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}

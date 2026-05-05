@@ -1,0 +1,54 @@
+.pending-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  position: relative;
+}
+
+.pending-container {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.pending-sigil {
+  font-size: 3rem;
+  color: var(--gold);
+  opacity: 0.5;
+  animation: pulse 3s ease-in-out infinite;
+  margin-bottom: 8px;
+}
+
+.pending-title {
+  font-size: 1.4rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pending-body {
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+.pending-body strong { color: var(--text); font-weight: 500; }
+
+.pending-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--border-gold);
+  margin: 8px 0;
+}
+
+.pending-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}

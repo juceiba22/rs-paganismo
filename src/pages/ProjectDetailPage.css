@@ -1,0 +1,43 @@
+.project-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.project-detail__icon {
+  font-size: 1.5rem;
+  color: var(--gold);
+  opacity: 0.5;
+}
+
+.project-detail__desc {
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+.project-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 16px;
+}
+
+.project-tab {
+  flex: 1;
+  padding: 8px;
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+
+.project-tab--active {
+  background: var(--bg-elevated);
+  color: var(--gold);
+}

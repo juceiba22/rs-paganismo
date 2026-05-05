@@ -1,0 +1,48 @@
+.file-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.file-card__icon {
+  font-size: 1.4rem;
+  color: var(--gold);
+  opacity: 0.6;
+  min-width: 32px;
+  text-align: center;
+}
+
+.file-card__body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-card__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.file-card__name:hover { color: var(--gold); }
+
+.file-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.file-card__delete {
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.75rem;
+}
+
+.file-card:hover .file-card__delete { opacity: 1; }

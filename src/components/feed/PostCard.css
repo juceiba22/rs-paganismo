@@ -1,0 +1,93 @@
+.post-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.post-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.post-card__meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.post-card__author {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.post-card__time {
+  opacity: 0.7;
+}
+
+.post-card__delete {
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.post-card:hover .post-card__delete {
+  opacity: 1;
+}
+
+.post-card__project-tag {
+  margin: -4px 0;
+}
+
+.post-card__content {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.post-card__image {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  max-height: 360px;
+}
+
+.post-card__link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--gold);
+  overflow: hidden;
+}
+
+.post-card__link span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-card__footer {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.post-card__comments-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.post-card__comments-btn:hover {
+  color: var(--text);
+}
