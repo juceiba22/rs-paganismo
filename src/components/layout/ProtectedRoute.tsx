@@ -12,9 +12,14 @@ export default function ProtectedRoute({
 }: Props) {
   const { currentUser, appUser, loading, isApproved } = useAuth();
 
-  // 1. Esperar carga REAL
-  if (loading || appUser === undefined) {
+  // 1a. Auth todavía no resolvió
+  if (loading) {
     return <div>Cargando...</div>;
+  }
+
+  // 1b. Auth OK pero Firestore todavía no respondió
+  if (appUser === undefined) {
+    return <div>Cargando perfil...</div>;
   }
 
   // 2. No logeado → login

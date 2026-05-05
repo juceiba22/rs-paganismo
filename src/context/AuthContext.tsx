@@ -40,22 +40,26 @@ export function useAuth() {
 async function fetchOrCreateAppUser(user: User): Promise<AppUser | null> {
   try {
     const ref = doc(db, 'users', user.uid);
-    const snap = await getDoc(ref);
 
-    if (snap.exists()) {
-      const data = snap.data();
-      return {
-        uid: user.uid,
-        name: data.name,
-        email: data.email,
-        role: data.role,
-        artisticRole: data.artisticRole,
-        photoURL: data.photoURL,
-        createdAt: data.createdAt?.toDate?.() ?? new Date(),
-      };
-    }
+    // Cambio 1b: timeout de 8s para evitar cold-start colgado
+    const timeoutPromise = new Promise<null>((resolve) =>
+      setTimeout(() => resolve(null), 8000)
+    );
 
-    return null;
+    const snap = await Promise.race([getDoc(ref), timeoutPromise]);
+
+    if (!snap || !snap.exists()) return null;
+
+    const data = snap.data();
+    return {
+      uid: user.uid,
+      name: data.name,
+      email: data.email,
+      role: data.role,
+      artisticRole: data.artisticRole,
+      photoURL: data.photoURL,
+      createdAt: data.createdAt?.toDate?.() ?? new Date(),
+    };
   } catch (err) {
     console.error('Firestore read failed:', err);
     return null;
@@ -70,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
+      setLoading(false); // Cambio 1a: Auth resolvió → desbloquear UI inmediatamente
 
       if (user) {
         try {
@@ -82,8 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setAppUser(null);
       }
-
-      setLoading(false);
     });
 
     return unsub;
@@ -110,9 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Firestore write failed (Google):', err);
     }
-
-    const au = await fetchOrCreateAppUser(user);
-    setAppUser(au);
+    // Cambio 1c: fetch eliminado — onAuthStateChanged ya lo dispara
   };
 
   const signInWithEmail = async (email: string, password: string) => {
