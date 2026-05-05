@@ -105,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: user.displayName ?? '',
           email: user.email ?? '',
           photoURL: user.photoURL ?? '',
-          role: 'pending',
+          role: 'extended',
           artisticRole: 'other',
           createdAt: serverTimestamp(),
         });
@@ -135,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: '',
         email: user.email ?? '',
         photoURL: '',
-        role: 'pending',
+        role: 'extended',
         artisticRole: 'other',
         createdAt: serverTimestamp(),
       });

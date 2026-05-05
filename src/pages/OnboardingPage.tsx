@@ -31,11 +31,11 @@ export default function OnboardingPage() {
         name: name.trim(),
         email: currentUser.email ?? '',
         photoURL: currentUser.photoURL ?? '',
-        role: 'pending',
+        role: 'extended',
         artisticRole,
         createdAt: serverTimestamp(),
       }, { merge: true });
-      navigate('/pending');
+      navigate('/');
     } catch {
       setError('Error al guardar. Inténtalo de nuevo.');
     } finally {

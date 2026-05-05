@@ -101,7 +101,7 @@ export default function ProfilePage() {
                             className="btn btn-primary"
                             style={{ fontSize: '0.75rem', padding: '6px 12px' }}
                             onClick={() => changeRole(u.uid, 'extended')}
-                          >Aprobar</button>
+                          >Reactivar</button>
                         </div>
                       </div>
                     ))}
