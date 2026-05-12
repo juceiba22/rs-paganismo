@@ -4,8 +4,6 @@ import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import type { AppUser, UserRole } from '../types';
 import Header from '../components/layout/Header';
-import BottomNav from '../components/layout/BottomNav';
-import './ProfilePage.css';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'Administrador',
@@ -14,14 +12,8 @@ const ROLE_LABELS: Record<UserRole, string> = {
   pending: 'Pendiente',
 };
 
-const ARTISTIC_LABELS: Record<string, string> = {
-  musician: 'Músico/a',
-  actor: 'Actor/Actriz',
-  visual: 'Arte Visual',
-  other: 'Otro',
-};
-
 function initials(name: string) {
+  if (!name) return '';
   return name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
 }
 
@@ -50,93 +42,141 @@ export default function ProfilePage() {
   const activeUsers = allUsers.filter((u) => u.role !== 'pending');
 
   return (
-    <div className="app-layout">
-      <Header title="Perfil" />
-      <main className="page-content page-enter">
-
-        <div className="profile-card card">
-          <div className="avatar avatar-lg">
-            {appUser.photoURL
-              ? <img src={appUser.photoURL} alt={appUser.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-              : initials(appUser.name)}
-          </div>
-          <div className="profile-card__info">
-            <h2 className="profile-card__name font-ritual">{appUser.name}</h2>
-            <p className="profile-card__email text-muted text-sm">{appUser.email}</p>
-            <div className="flex gap-8 mt-4">
-              <span className={`badge badge-${appUser.role}`}>{ROLE_LABELS[appUser.role]}</span>
-              <span className="badge" style={{ background: 'var(--bg-elevated)', color: 'var(--text-soft)' }}>
-                {ARTISTIC_LABELS[appUser.artisticRole]}
-              </span>
+    <>
+      <Header 
+        title={appUser.username || appUser.name.replace(/\s+/g, '').toLowerCase() || 'perfil'} 
+        right={
+          <button onClick={logout} className="text-sm font-semibold text-neutral-300 hover:text-white">
+            Salir
+          </button>
+        }
+      />
+      <div className="bg-black text-white min-h-screen pb-20">
+        {/* Profile Header */}
+        <div className="px-4 py-6 border-b border-neutral-900">
+          <div className="flex items-center gap-6">
+            <div className="w-20 h-20 rounded-full overflow-hidden bg-neutral-800 flex-shrink-0 flex items-center justify-center border border-neutral-800">
+              {appUser.avatarUrl || appUser.photoURL ? (
+                <img src={appUser.avatarUrl || appUser.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-xl font-bold text-neutral-500">{initials(appUser.displayName || appUser.name)}</span>
+              )}
             </div>
+            <div className="flex-1 flex justify-between text-center">
+              <div>
+                <div className="font-semibold text-lg">0</div>
+                <div className="text-xs text-neutral-400">publicaciones</div>
+              </div>
+              <div>
+                <div className="font-semibold text-lg">0</div>
+                <div className="text-xs text-neutral-400">seguidores</div>
+              </div>
+              <div>
+                <div className="font-semibold text-lg">0</div>
+                <div className="text-xs text-neutral-400">seguidos</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <h2 className="font-semibold text-sm">{appUser.displayName || appUser.name}</h2>
+            <div className="flex gap-2 mt-1 mb-2">
+              <span className="text-xs bg-neutral-900 text-neutral-300 px-2 py-0.5 rounded-sm">{ROLE_LABELS[appUser.role]}</span>
+            </div>
+            {appUser.bio && <p className="text-sm text-neutral-200">{appUser.bio}</p>}
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <button className="flex-1 bg-neutral-900 hover:bg-neutral-800 text-white font-semibold py-1.5 px-4 rounded-md text-sm transition-colors border border-neutral-800">
+              Editar perfil
+            </button>
+            <button className="flex-1 bg-neutral-900 hover:bg-neutral-800 text-white font-semibold py-1.5 px-4 rounded-md text-sm transition-colors border border-neutral-800">
+              Compartir perfil
+            </button>
           </div>
         </div>
 
-        <button className="btn btn-ghost w-full mt-16" onClick={logout}>
-          Cerrar sesión
-        </button>
+        {/* Content Tabs Placeholder */}
+        <div className="flex border-b border-neutral-900">
+          <button className="flex-1 py-3 text-sm font-semibold border-b-2 border-white text-white">
+            <svg className="w-6 h-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Grid Placeholder */}
+        <div className="grid grid-cols-3 gap-0.5 mt-0.5">
+          {/* Empty grid items */}
+        </div>
 
         {isAdmin && (
-          <div className="admin-panel mt-24">
-            <div className="section-header">
-              <span className="section-title">Panel de Administración</span>
-            </div>
-
+          <div className="mt-8 px-4">
+            <h3 className="text-sm font-semibold text-neutral-400 mb-4 uppercase tracking-wider">Panel de Administración</h3>
             {loadingUsers ? (
-              <div className="loader"><div className="loader-ring" /></div>
+              <div className="text-center py-4 text-neutral-500 text-sm">Cargando usuarios...</div>
             ) : (
-              <>
+              <div className="space-y-6">
                 {pendingUsers.length > 0 && (
-                  <div className="admin-section">
-                    <p className="admin-section__label">Solicitudes pendientes ({pendingUsers.length})</p>
-                    {pendingUsers.map((u) => (
-                      <div key={u.uid} className="admin-user-row card">
-                        <div className="avatar">{initials(u.name || u.email)}</div>
-                        <div className="admin-user-row__info">
-                          <span className="font-500 text-sm">{u.name || '(sin nombre)'}</span>
-                          <span className="text-xs text-muted">{u.email}</span>
-                        </div>
-                        <div className="flex gap-8">
+                  <div>
+                    <h4 className="text-sm text-red-400 mb-2">Solicitudes pendientes ({pendingUsers.length})</h4>
+                    <div className="space-y-2">
+                      {pendingUsers.map((u) => (
+                        <div key={u.uid} className="flex items-center justify-between bg-neutral-900 p-3 rounded-md">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center text-xs font-bold">
+                              {initials(u.displayName || u.name || u.email)}
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium">{u.displayName || u.name || '(sin nombre)'}</div>
+                              <div className="text-xs text-neutral-500">{u.email}</div>
+                            </div>
+                          </div>
                           <button
-                            className="btn btn-primary"
-                            style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded"
                             onClick={() => changeRole(u.uid, 'extended')}
-                          >Reactivar</button>
+                          >
+                            Aprobar
+                          </button>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 )}
 
-                <div className="admin-section">
-                  <p className="admin-section__label">Miembros activos</p>
-                  {activeUsers.map((u) => (
-                    <div key={u.uid} className="admin-user-row card">
-                      <div className="avatar">{initials(u.name || u.email)}</div>
-                      <div className="admin-user-row__info">
-                        <span className="font-500 text-sm">{u.name}</span>
-                        <span className="text-xs text-muted">{u.email}</span>
+                <div>
+                  <h4 className="text-sm text-neutral-300 mb-2">Miembros activos</h4>
+                  <div className="space-y-2">
+                    {activeUsers.map((u) => (
+                      <div key={u.uid} className="flex items-center justify-between bg-neutral-900 p-3 rounded-md">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center text-xs font-bold">
+                            {initials(u.displayName || u.name || u.email)}
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium">{u.username || u.displayName || u.name}</div>
+                            <div className="text-xs text-neutral-500">{u.email}</div>
+                          </div>
+                        </div>
+                        <select
+                          className="bg-black border border-neutral-700 text-white text-xs rounded px-2 py-1 focus:outline-none focus:border-neutral-500"
+                          value={u.role}
+                          onChange={(e) => changeRole(u.uid, e.target.value as UserRole)}
+                        >
+                          <option value="admin">Admin</option>
+                          <option value="core">Central</option>
+                          <option value="extended">Extendido</option>
+                          <option value="pending">Pendiente</option>
+                        </select>
                       </div>
-                      <select
-                        className="input select"
-                        value={u.role}
-                        onChange={(e) => changeRole(u.uid, e.target.value as UserRole)}
-                        style={{ width: 'auto', fontSize: '0.78rem', padding: '5px 28px 5px 8px' }}
-                      >
-                        <option value="admin">Admin</option>
-                        <option value="core">Central</option>
-                        <option value="extended">Extendido</option>
-                        <option value="pending">Pendiente</option>
-                      </select>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
         )}
-      </main>
-      <BottomNav />
-    </div>
+      </div>
+    </>
   );
 }

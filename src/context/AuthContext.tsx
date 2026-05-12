@@ -23,7 +23,7 @@ interface AuthContextType {
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, username?: string, displayName?: string) => Promise<void>;
   logout: () => Promise<void>;
   isAdmin: boolean;
   isApproved: boolean;
@@ -59,6 +59,10 @@ async function fetchOrCreateAppUser(user: User): Promise<AppUser | null> {
       artisticRole: data.artisticRole,
       photoURL: data.photoURL,
       createdAt: data.createdAt?.toDate?.() ?? new Date(),
+      username: data.username,
+      displayName: data.displayName,
+      bio: data.bio,
+      avatarUrl: data.avatarUrl,
     };
   } catch (err) {
     console.error('Firestore read failed:', err);
@@ -108,6 +112,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           role: 'extended',
           artisticRole: 'other',
           createdAt: serverTimestamp(),
+          username: user.email?.split('@')[0] ?? '',
+          displayName: user.displayName ?? '',
+          avatarUrl: user.photoURL ?? '',
         });
       }
     } catch (err) {
@@ -120,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signUpWithEmail = async (email: string, password: string) => {
+  const signUpWithEmail = async (email: string, password: string, username?: string, displayName?: string) => {
     if (!auth || !db) throw new Error('Firebase not initialized');
 
     const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -132,12 +139,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const ref = doc(db, 'users', user.uid);
       await setDoc(ref, {
         uid: user.uid,
-        name: '',
+        name: displayName ?? '',
         email: user.email ?? '',
         photoURL: '',
         role: 'extended',
         artisticRole: 'other',
         createdAt: serverTimestamp(),
+        username: username ?? '',
+        displayName: displayName ?? '',
+        avatarUrl: '',
       });
     } catch (err) {
       console.error('Firestore write failed (signup):', err);

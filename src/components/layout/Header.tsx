@@ -1,21 +1,24 @@
 import React from 'react';
-import './Header.css';
 
 interface Props {
   title: string;
   subtitle?: string;
   right?: React.ReactNode;
+  left?: React.ReactNode;
 }
 
-export default function Header({ title, subtitle, right }: Props) {
+export default function Header({ title, subtitle, right, left }: Props) {
   return (
-    <header className="app-header">
-      <div className="app-header__inner">
-        <div className="app-header__text">
-          <span className="app-header__title font-ritual">{title}</span>
-          {subtitle && <span className="app-header__subtitle">{subtitle}</span>}
+    <header className="sticky top-0 z-50 bg-black text-white border-b border-neutral-800">
+      <div className="flex items-center justify-between h-14 px-4">
+        <div className="flex items-center gap-3">
+          {left}
+          <div className="flex flex-col">
+            <span className="text-lg font-semibold tracking-wide">{title}</span>
+            {subtitle && <span className="text-xs text-neutral-400">{subtitle}</span>}
+          </div>
         </div>
-        {right && <div className="app-header__right">{right}</div>}
+        {right && <div className="flex items-center gap-4">{right}</div>}
       </div>
     </header>
   );

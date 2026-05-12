@@ -9,6 +9,10 @@ export interface AppUser {
   artisticRole: ArtisticRole;
   photoURL?: string;
   createdAt: Date;
+  username?: string;
+  displayName?: string;
+  bio?: string;
+  avatarUrl?: string;
 }
 
 export interface Post {
